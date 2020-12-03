@@ -5,6 +5,7 @@ import { Link, Redirect } from 'react-router-dom';
 export default class Login extends Component {
 
     state={}
+    
 
     handleSubmit = e => {
         e.preventDefault();
@@ -17,21 +18,24 @@ export default class Login extends Component {
 
         axios.post('api/users/login', data)
             .then(res => {
-               console.log(res.data);
+               
                 localStorage.setItem('token', res.data);
-                localStorage.setItem('E-mail', this.email);
+                localStorage.setItem('E-mail', this.email)
 
                 this.setState({
-                    loggedIn: true
+                    loggedIn: true,
+                    token: res.data,
                 });
                 console.log("Login_success");
                 
               //this.props.history.push('/');
               this.props.setUser(res.data);//토큰값을 setUser속성값에 넣어줌.
+              console.log(this.state.token);
             })
             .catch(err => {
                 console.log(err)
             })
+
     };
 
 

@@ -6,8 +6,8 @@ import { Nav } from './components/'
 import { Provider } from 'react-redux'
 import TestContainer from './components/TestContainer'
 import { BrowserRouter,Route,Switch } from 'react-router-dom';
-import { GoogleMaps,GoogleMaps2 } from './pages/';
-import { Home, Login, Register, Test,TestPage } from './components/';
+import { GoogleMaps, GoogleMaps2, GoogleMaps3 } from './pages/';
+import { Home, Login, Register, Test,TestPage, User } from './components/';
 import StoreAdd from './components/Add';
 import axios from 'axios';
 // <Provider store={store}></Provider>
@@ -73,10 +73,12 @@ setUser=users=>{
               <Route exact path="/" component={()=><Home user={this.state.user} />}/>
       <Route exact path="/login" component={ ()=> <Login setUser={this.setUser} /> } />
                 <Route exact path="/testpage" component={TestPage} />
+                <Route exact path="/user" component={User}/>
                 <Route exact path="/test" component={Test}/>
                 <Route exact path="/register" component={Register} />
                 <Route exact path="/gmap" component={GoogleMaps} />
                 <Route exact path="/gmap2" component={GoogleMaps2} />
+                <Route exact path="/gmap3" component={GoogleMaps3} />
                 <Route exact path="/add" component={StoreAdd} />
 
             </Switch>

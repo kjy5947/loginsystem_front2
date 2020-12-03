@@ -5,9 +5,17 @@ import Geocode from "react-geocode";
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import ImageUploader from 'react-images-upload';
 import Select from 'react-select';
+import styled from 'styled-components'
 
 Geocode.setApiKey('AIzaSyADqbxpNSjkexoSicNUJisluXPzuhSmCDs');
 
+
+const Wrap = styled.div` 
+padding: 20px; 
+input { width: 50%; height: 20px; 
+border: 1px solid #ccc; } 
+textarea { positon: absolute;
+  width: 70%; height: 100px; border: 1px solid #ccc; } `;
 
 
 
@@ -23,6 +31,7 @@ export class StoreAdd extends React.Component{
           onoff: 0,
           image: '',     
           type: null,  
+          info: null,
       }
     }
 
@@ -74,6 +83,7 @@ export class StoreAdd extends React.Component{
         ,lng:this.state.lng
         ,onoff:this.state.onoff
         ,type:this.state.type
+        ,info:this.state.info
 
       };
       Axios.post("http://18.234.107.127:8080/addinfo",data
@@ -98,11 +108,29 @@ export class StoreAdd extends React.Component{
               image: '',
         })
     }
+    
+    getemail = () => {
+        const a = localStorage.getItem('token');
+        var headers = {'X-AUTH-TOKEN':a}
+        var data = { 'token': localStorage.getItem('token')}
+        Axios
+          .post('http://18.234.107.127:8080/api/authapi', data, { headers })
+          .then(
+            res => {
+              this.setState(
+                {owner: res.data}
+              )
+            }
+          )
 
+
+
+    }
+   
   
 
     render() {
-
+      this.getemail();
     const options = [
       {label:'Street Store', value:0},
       {label:'Busking', value:1}
@@ -139,8 +167,9 @@ export class StoreAdd extends React.Component{
       }
      const {name,owner} = this.state;
      
+     
         return(
-            
+          <Wrap>
             <div className="backgroundimage">
 
               <form onSubmit={this.handleSubmit}>
@@ -153,8 +182,8 @@ export class StoreAdd extends React.Component{
         
               /></li>
               <li> <input className='location-search-input' type='text' 
-              placeholder='주인' name='owner' value={owner}
-              onChange={this.handleInputChange}/></li>
+              placeholder={owner} name='owner' value={owner} readonly='readonly'
+             /></li>
   <li>
                 <PlacesAutocomplete
         value={this.state.address}
@@ -187,7 +216,7 @@ export class StoreAdd extends React.Component{
                       style,
                     })}
                   >
-                    <i class="material-icons">location_on</i><span>{suggestion.description}</span>
+                    <span>{suggestion.description}</span>
                   </div>
                 );
               })}
@@ -204,15 +233,24 @@ export class StoreAdd extends React.Component{
       </li>
       <img className='image' src={this.state.image} height='200px'/>
       <li
-      className= 'location-search-input'>
+      className= 'select'>
       <Select 
       options={options}
       onChange={this.selectbutton}/>
       </li>
+      <li>
+    
+        <textarea type="text" 
+        name="info" 
+        onChange={this.handleInputChange} 
+        value={this.state.info} /> 
+        </li>
+
       <button className='submit'>등록하기</button>
       </ul>
       </form>
       </div>
+      </Wrap>
     
           
         )

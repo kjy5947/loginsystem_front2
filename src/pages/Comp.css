@@ -1,26 +1,108 @@
 .mapbtn {
-    color: white;
-    background: rgb(48, 196, 48);
-    padding: 0.375rem 0.75rem;
-    border: 1px solid rgb(2, 58, 58);
-    border-radius: 0.25rem;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-.mapbtn:hover{
-  color: teal;
-  background: white;
+  color: white;
+  background: rgb(48, 196, 48);
   padding: 0.375rem 0.75rem;
-  border: 1px solid teal;
+  border: 1px solid rgb(2, 58, 58);
   border-radius: 0.25rem;
   font-size: 1rem;
   line-height: 1.5;
 }
+.mapbtn:hover{
+color: teal;
+background: white;
+padding: 0.375rem 0.75rem;
+border: 1px solid teal;
+border-radius: 0.25rem;
+font-size: 1rem;
+line-height: 1.5;
+}
 .maps{
-  height: 500px; /* Nested 방지 */
-  width: 100%
+height: 500px; /* Nested 방지 */
+width: 100%
 }
 .part{
-  margin: 0;
-  border: 0;
+margin: 0;
+border: 0;
+}
+
+/*
+* home into content
+*/
+
+.home-into-content{
+margin: 100px auto 0;
+overflow: hidden;
+width: 900px;
+}
+
+
+.home-into-content  li{
+float: left;
+width: calc((100% - 20px)/2);
+text-align: center;
+}
+
+.home-into-content  li + li{
+margin-left: 20px;
+}
+
+.home-into-content  li img{
+width: 100%;
+height: auto;
+}
+
+.flip-card {
+background-color: transparent;
+width: 298px;
+height: 268px;
+border: 1px solid #f1f1f1;
+perspective: 1000px; 
+margin: 0 auto;
+}
+
+.flip-card-inner {
+position: relative;
+width: 100%;
+height: 100%;
+text-align: center;
+transition: transform 0.8s;
+transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+position: absolute;
+width: 100%;
+height: 100%;
+-webkit-backface-visibility: hidden;
+backface-visibility: hidden;
+}
+
+.flip-card-back h1 {
+font-size: 20px;
+line-height: 25px;
+margin-top: 50px;
+word-break: keep-all;
+}
+
+.flip-card-back p {
+font-size: 15px;
+line-height: 20px;
+margin-top: 10px;
+word-break: keep-all;
+}
+
+.flip-card-front {
+background-color: #bbb;
+color: black;
+}
+
+.flip-card-back {
+background-color: #23421f;
+color: white;
+transform: rotateY(180deg);
+padding: 0 30px;
 }

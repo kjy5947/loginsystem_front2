@@ -9,6 +9,7 @@
 
 
 .location-search-input{
+  
     font-family: 'Lato', sans-serif;
     width: 200px;
     height: 50px;
@@ -25,14 +26,15 @@
 }
 .image-input{
     position: relative;
-    top:100px;
+    top:200px;
 
 }
 
 .image{
     position: relative;
-    top:100px;
+    top: 100px;
     right: 100px;
+    bottom: 500px;
 }
 
 .submit{
@@ -50,4 +52,10 @@
     font-size: 1rem;
     font-weight: bold;
     color: black;
+}
+
+.select{
+    position: absolute;;
+   
+
 }

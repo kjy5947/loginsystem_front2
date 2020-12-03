@@ -12,7 +12,8 @@ import Axios from 'axios';
 const store = createStore(rootReducer) // DevTools.instrument()
 Axios.defaults.baseURL='http://18.234.107.127:8080/';
 Axios.defaults.headers.common['X-AUTH-TOKEN']=localStorage.getItem('token');
-Axios.defaults.headers.common['E-MAIL-TOKEN']=localStorage.getItem('E-mail');
+Axios.defaults.headers.common['E-MAIL_TOKEN']=localStorage.getItem('E-mail');
+
 ReactDOM.render(
   <BrowserRouter>
     <App />

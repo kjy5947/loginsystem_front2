@@ -1,55 +1,36 @@
-import React from 'react';
+import * as React from "react";
 import Axios from 'axios';
 import './Comp.css';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
-import { Link } from 'react-router-dom';
 
-export class GoogleMaps2 extends React.Component {
+export class GoogleMaps extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
             list: [],
-            justOn: false,
-            justMarket: true,
-            justBusking: true,
-            justAll: true,
+            data: [],
             showingInfoWindow: false,
             activeMarker: {},
-            selectedPlace: {}
+            selectedPlace: {},
+            click: false,
+            justOn: false,
+            currentPosition: {},
+            currentDid: false,
+            image: null,
+            info: null,
         }
     }
 
-    componentDidMount() {
-        var list = [];
-        var headers = {
-            'Content-Type': 'application/json'
-        }
-        Axios.get("http://18.234.107.127:8080/data", { headers })
-            .then(res => {
-                for (let i = 0; i < res.data.length; i++) {
-                    list.push({
-                        id: res.data[i].id,
-                        name: res.data[i].name,
-                        owner: res.data[i].owner,
-                        lat: res.data[i].lat,
-                        lng: res.data[i].lng,
-                        onoff: res.data[i].onoff,
-                        like: res.data[i].like,
-                        type: res.data[i].type
-                    })
-                }
-                this.setState({
-                    list: this.state.list.concat(list)
-                })
-            })
-    }
-
-    //In Map
     onMarkerClick = (props, marker, e) => {
         this.setState({
             selectedPlace: props,
             activeMarker: marker,
             showingInfoWindow: true
+        })
+        this.showinformation();
+        this.setState({
+            image: null,
         })
     }
 
@@ -60,135 +41,203 @@ export class GoogleMaps2 extends React.Component {
                 activeMarker: null
             })
         }
+
     }
-
-
-    //In Interface
     clickJustOpen = () => {
         this.setState({
-            justOn: !this.state.justOn
+            justOn: !this.state.justOn,
+            showingInfoWindow: false,
         })
     }
 
-    clickAll = () => {
-        this.setState({
-            justBusking: true,
-            justMarket: true,
-        })
-    }
-    clickJustMarket = () => {
-        this.setState({
-            justMarket: true,
-            justBusking: false,
-        })
-    }
-    clickJustBusking = () => {
-        this.setState({
-            justBusking: true,
-            justMarket: false,
-        })
-    }
+    current() {
+        var request = {
+            lat: this.state.currentPosition.lat,
+            lng: this.state.currentPosition.lng
+        }
 
+        var a = JSON.stringify(request)
+        var list = [];
+        var headers = {
+            'Content-Type': 'application/json'
+        }
+
+        Axios.post("http://18.234.107.127:8080/curdata", a , { headers })
+            .then(res => {
+                for (let i = 0; i < res.data.length; i++) {
+                    if (res.data[i].type == 1) {
+                        list.push({
+                            id: res.data[i].id,
+                            name: res.data[i].name,
+                            owner: res.data[i].owner,
+                            lat: res.data[i].lat,
+                            lng: res.data[i].lng,
+                            onoff: res.data[i].onoff,
+                            like: res.data[i].like,
+                            type: res.data[i].type
+                        })
+                    }
+                }
+
+                this.setState({
+                    list: this.state.list.concat(list)
+                })
+            })
+    }
+    
+    showinformation=()=>{
+
+        const email = this.state.selectedPlace.data;
+        console.log(email);
+        let b = {
+            "owner": email
+        }
+
+        var data = [];
+        var headers = {
+            'Content-Type': 'application/json'
+        }
+
+        Axios.post("http://18.234.107.127:8080/image", b, { headers })
+            .then(response => {
+                
+                console.log(response);
+                this.setState({
+                    image: response.data.image,
+                    info: response.data.info,
+                })
+           
+
+            })
+        
+    }
+    /*getdata() {
+        const email = window.localStorage.getItem("E-mail");
+        let b = {
+            "owner": email
+        }
+
+        var data = [];
+        var headers = {
+            'Content-Type': 'application/json'
+        }
+
+        Axios.post("http://18.234.107.127:8080/image", b, { headers })
+            .then(response => {
+                console.log(response);
+                console.log(response.data);
+                for (let i = 0; i < response.data.length; i++) {
+                    data.push({
+                        address: response.data[i].address,
+                        id: response.data[i].id,
+                        image: response.data[i].image,
+                        info: response.data[i].info,
+                        owner: response.data[i].owner,
+                    })
+                }
+                this.setState({
+                    data: this.state.data.concat(data)
+                })
+            })
+    }
+*/
+    componentDidMount() {
+        navigator.geolocation.getCurrentPosition((position) => {
+            this.setState({
+                currentPosition: {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                }
+            })
+            this.current()
+            this.setState({
+                currentDid: true
+            })
+        })
+    }
 
     render() {
-        return (
-            <div>
-                <Map google={this.props.google}
-
-                    // 맵 옵션
-                    style={{
-                        width: '100%',
-                        height: '500px'
-                    }}
-                    containerStyle={{
-                        width: '100%',
-                        height: '500px'
-                    }}
-                    initialCenter={{ lat: 37.551, lng: 126.924 }}
-                    zoom={15}
-                    streetViewControl={false}
-                    mapTypeControl={false}
-
-                    onClick={this.onMapClick}
-
-                // Marker 
-                >
-
-                    {this.state.list.map((l) => {
-                        // on/off
-                        var url
-                        var clickVision = true // justOpen
-                        var jMarket = true // justMarket
-                        var jBusking = true // justBusking
-
-                        // justOpen
-                        if (l.onoff) {
-                            url = './icon2.png'
-                        }
-                        else {
-                            url = './icon.png'
-                            if (this.state.justOn)
-                                clickVision = false
-                        }
-
-                        // justType (0-Market, 1-Busking)
-                        if (!this.state.justMarket) {
-                            if (l.type === 0)
-                                jMarket = false
-                        }
-
-                        if (!this.state.justBusking) {
-                            if (l.type === 1)
-                                jBusking = false
-                        }
-
-                        var vision = clickVision && jMarket && jBusking
-
-                        // size
-                        var size = 20 + l.like / 6;
-                        // return
-                        return (
-                            <Marker
-                                position={{ lat: l.lat, lng: l.lng }}
-                                name={l.name}
-                                data={l.owner}
-                                // animation={4}
-                                icon={{
-                                    url: url,
-                                    scaledSize: new window.google.maps.Size(size, size)
-                                }}
-                                visible={vision}
-
-                                onClick={this.onMarkerClick}
-                            >
-                            </Marker>
-                        )
-                    })}
-                    <InfoWindow
-                        marker={this.state.activeMarker}
-                        visible={this.state.showingInfoWindow}
+        if (this.state.currentDid == false) {
+            return (
+                <div>
+                    <br />
+                    <br />
+                    <br />
+                    <h1> 현재 위치를 가져오고 있습니다.</h1>
+                </div>
+            )
+        }
+        else {
+            return (
+                <div>
+                    <Map google={this.props.google}
+                        // 맵 옵션
+                        style={{
+                            width: '100%',
+                            height: '500px'
+                        }}
+                        containerStyle={{
+                            width: '100%',
+                            height: '500px'
+                        }}
+                        initialCenter={this.state.currentPosition}
+                        zoom={15}
+                        onClick={this.onMapClick}
                     >
-                        <div>
-                            <p> 상호명 </p>
-                            <h1> {this.state.selectedPlace.name} </h1>
-                            <p> 소유자: {this.state.selectedPlace.data} </p>
-                        </div>
-                    </InfoWindow>
-                </Map>
-                <div className="maps" />
-                <br />
-                <button className="mapbtn" onClick={this.clickJustOpen}> 오픈한 곳만 보기 </button>
-                <button className="mapbtn" onClick={this.clickJustMarket}> 소상공인 보기 </button>
-                <button className="mapbtn" onClick={this.clickJustBusking}> 버스킹 보기 </button>
-                <button className="mapbtn" onClick={this.clickAll}> 전체 보기 </button>
-                <br />
-                <br />
-                <Link to="/"> 홈으로 </Link>
-            </div>
-        )
+                        {this.state.list.map((l) => {
+                            var clickVision = true
+                            //on 상태를 0, off상태를 1로하면 해결
+                            if (this.state.justOn && l.onoff)
+                                clickVision = false;
+
+                            var size = 20 + l.like / 6;
+                            return (
+                                <Marker
+                                    position={{
+                                        lat: l.lat,
+                                        lng: l.lng
+                                    }}
+                                    name={l.name}
+                                    data={l.owner}
+                                    icon={{
+                                        url: './icon2.png',
+                                        scaledSize: new window.google.maps.Size(size, size)
+                                    }}
+                                    visible={clickVision}
+                                    onClick={this.onMarkerClick}
+                                >
+                                </Marker>
+                            )
+                        })}
+                        <InfoWindow
+                            marker={this.state.activeMarker}
+                            visible={this.state.showingInfoWindow}
+                        >
+                            <div>
+                                <p> 상호명 </p>
+                                <h1> {this.state.selectedPlace.name} </h1>
+                                <p> 소유자: {this.state.selectedPlace.data} </p>
+                              
+                            </div>
+                        </InfoWindow>
+
+                    </Map>
+                    <div className="maps" />
+                    <br />
+                    <button className="mapbtn" onClick={this.clickJustOpen}> 오픈한 가게만 보기 </button>
+                    <img src={this.state.image}/>
+                    <p>
+                        {this.state.info}
+                    </p>
+                </div>
+            )
+        }
     }
 }
 
-export default GoogleApiWrapper({
-    apiKey: ('AIzaSyBeN8qlwaJ6ex9K23whBYw_I5qHg0k1eqI')
-})(GoogleMaps2)
+export default GoogleApiWrapper((props) => ({
+    apiKey: ('AIzaSyBeN8qlwaJ6ex9K23whBYw_I5qHg0k1eqI'),
+    language: 'ko'
+
+})
+)(GoogleMaps);
